@@ -36,7 +36,7 @@ namespace BigInt
             //    sign = -1;
             //    number.Remove(0, 1);
             //}
-            //else if (number[0] != '0')
+            //else
             //    sign = 1;
             //else
             //    sign = 0;
@@ -78,21 +78,18 @@ namespace BigInt
             return result.ToString();
         }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(data, Length, IsZero);
-        }
-
         public uint Length
         {
             get
             {
                 if (IsZero) return 0;
-                if (data[data.Count - 1] == 1)
-                    return (uint)(data.Count - 1) * (uint)Math.Round(Math.Log10(Base)) + 1;
+                uint pow = 1;
+                while(data[data.Count - 1] >= Math.Pow(10,pow))
+                {
+                    pow += 1;
+                }
 
-                return (uint)(data.Count - 1) * (uint)Math.Round(Math.Log10(Base)) +
-                    (uint)Math.Ceiling(Math.Log10(data[data.Count - 1]));
+                return (uint)(data.Count - 1) * (uint)Math.Round(Math.Log10(Base)) + pow;
             }
         }
 

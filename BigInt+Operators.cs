@@ -58,8 +58,8 @@ namespace BigInt
             if (this.data.Count < other.data.Count)
             {
                 throw new NotImplementedException();
-                //min = this;
-                //max = other;
+                min = this;
+                max = other;
                 //result.sign = -1;
             }
             else
@@ -146,45 +146,49 @@ namespace BigInt
             return result;
         }
 
-        private BigInt Div(int other, out int modulus)
+        private BigInt Div(int other, out int remainder)
         {
             if (other == 0)
                 throw new DivideByZeroException();
+
             if (other < 0)
                 throw new NotImplementedException();
-            BigInt result = new BigInt();
-            result.data.Clear();
+            BigInt quotent = new BigInt();
+            quotent.data.Clear();
             ulong carry = 0;
             uint uOther = (uint)other;
             for (int i = data.Count - 1; i >=0; i--)
             {
                 ulong cur = data[i] + carry * Base;
-                result.data.Insert(0, (uint)(cur / uOther));
+                quotent.data.Insert(0, (uint)(cur / uOther));
                 carry = cur % uOther;
             }
-            modulus = (int)carry;
+            remainder = (int)carry;
 
-            result.TrimZeros();
-            return result;
+            quotent.TrimZeros();
+            return quotent;
         }
 
-        private BigInt Div(BigInt other, out BigInt modulus)
+        private BigInt Div(BigInt other, out BigInt remainder)
         {
             if (other.IsZero)
                 throw new DivideByZeroException();
+
             if (other.Length > this.Length)
             {
-                modulus = this;
+                remainder = this;
                 return new BigInt();
             }
 
-            BigInt result = new BigInt();
+            BigInt quotent = new BigInt();
             BigInt divided = new BigInt();
             int i = (int)this.Length - 1;
             while (i >= 0)
             {
-                while (i >= 0 && divided <= other)
+                divided = (divided * 10) + this[i--];
+                while (i >= 0 && divided < other)
                 {
+                    quotent = quotent * 10;
                     divided = (divided * 10) + this[i];
                     i -= 1;
                 }
@@ -197,11 +201,11 @@ namespace BigInt
                     prod = other + prod;
                 }
                 q -= 1;
-                result = result * 10 + q;
+                quotent = quotent * 10 + q;
                 divided = divided - (other * q);
             }
-            modulus = divided;
-            return result;
+            remainder = divided;
+            return quotent;
         }
 
         public int CompareTo(BigInt other)
